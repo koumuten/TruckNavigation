@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>位置情報転送中</title>
+    <style>
+        body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f0f2f5; }
+        .loader { text-align: center; }
+    </style>
+</head>
+<body>
+    <div id="status" class="loader">
+        <p>最新の位置情報を取得しています...</p>
+    </div>
+
+    <script>
+        // あなたのGASウェブアプリURLをここに貼り付けてください
+        const GAS_API_URL = "https://script.google.com/macros/s/XXXXX/exec";
+
+        async function redirect() {
+            try {
+                const response = await fetch(GAS_API_URL);
+                const data = await response.json();
+
+                if (data.url) {
+                    // GitHub Pagesはiframeではないので、通常のlocationで自動リダイレクト可能
+                    window.location.href = data.url;
+                } else {
+                    document.getElementById('status').innerHTML = "<h2>現在運搬が行われていないようです</h2><p>しばらく経ってから再度お試しください。</p>";
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('status').innerText = "エラーが発生しました。接続を確認してください。";
+            }
+        }
+
+        redirect();
+    </script>
+</body>
+</html>
