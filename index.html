@@ -17,22 +17,29 @@
     <script>
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx7iwJtKtz-XecG7RofNqkw0IoZ_t6UEVKlXQlmtMulH-e-TTsdsL2PErR_Y5o8ix9QSg/exec";
 
-        async function redirect() {
-            try {
-                const response = await fetch(GAS_API_URL);
-                const data = await response.json();
-
-                if (data.url) {
-                    // GitHub Pagesはiframeではないので、通常のlocationで自動リダイレクト可能
-                    window.location.href = data.url;
-                } else {
-                    document.getElementById('status').innerHTML = "<h2>現在運搬が行われていないようです</h2><p>しばらく経ってから再度お試しください。</p>";
+        async function redirect() {            
+                try {
+                    // GASのリダイレクトを追いかける設定でfetch
+                    const response = await fetch(GAS_API_URL, {
+                        method: "GET",
+                        redirect: "follow"
+                    });
+            
+                    if (!response.ok) throw new Error('Network response was not ok');
+            
+                    const data = await response.json();
+            
+                    if (data.url) {
+                        window.location.replace(data.url);
+                    } else {
+                        document.getElementById('status').innerHTML = 
+                            "<h2>現在運搬が行われていないようです</h2><p>しばらく経ってから再度お試しください。</p>";
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('status').innerText = "データの取得に失敗しました。";
                 }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('status').innerText = "エラーが発生しました。接続を確認してください。";
             }
-        }
 
         redirect();
     </script>
